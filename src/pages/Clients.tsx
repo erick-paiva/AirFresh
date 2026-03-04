@@ -258,6 +258,34 @@ function ClientForm({ initialData, onSubmit, onCancel }: { initialData: Client |
     setFormData(prev => ({ ...prev, lat, lng, address: `Local selecionado (${lat.toFixed(4)}, ${lng.toFixed(4)})` }));
   };
 
+  const handleGetCurrentLocation = () => {
+    if ('geolocation' in navigator) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const { latitude, longitude } = position.coords;
+          setFormData(prev => ({ 
+            ...prev, 
+            lat: latitude, 
+            lng: longitude,
+            address: `Local atual (${latitude.toFixed(4)}, ${longitude.toFixed(4)})`
+          }));
+        },
+        (error) => {
+          console.error("Error getting location:", error);
+          alert("Não foi possível obter sua localização. Verifique as permissões do navegador.");
+        }
+      );
+    } else {
+      alert("Geolocalização não suportada neste navegador.");
+    }
+  };
+
+  React.useEffect(() => {
+    if (!initialData) {
+      handleGetCurrentLocation();
+    }
+  }, [initialData]);
+
   return (
     <div className="p-6 space-y-6">
       <div className="grid gap-4 sm:grid-cols-2">
@@ -280,7 +308,12 @@ function ClientForm({ initialData, onSubmit, onCancel }: { initialData: Client |
       </div>
 
       <div className="space-y-2">
-        <label className="text-sm font-medium text-slate-700">Localização</label>
+        <div className="flex items-center justify-between">
+          <label className="text-sm font-medium text-slate-700">Localização</label>
+          <Button type="button" variant="ghost" size="sm" onClick={handleGetCurrentLocation} className="text-blue-600 hover:text-blue-700">
+            <MapPin className="mr-1 h-3 w-3" /> Usar minha localização
+          </Button>
+        </div>
         <div className="h-64 w-full overflow-hidden rounded-lg border border-slate-200">
           <Map
             center={[formData.lat, formData.lng]}
