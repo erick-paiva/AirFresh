@@ -1,0 +1,7 @@
+{
+  "name": "AirFresh CRM",
+  "description": "Gestão de manutenção de ar-condicionado",
+  "requestFramePermissions": [
+    "geolocation"
+  ]
+}
